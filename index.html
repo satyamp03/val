@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>will u b my valentine?</title>
+  
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
   <style>
     :root {
       --bg1: #ffd6e7;
@@ -208,7 +212,7 @@
     </div>
 
     <form id="step2" class="question-phase">
-      <h2>Yay! Let's plan the date 🌏</h2>
+      <h2>OMG YAY!🎉🥳 let's plan the date 🌏</h2>
       
       <img class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
       
@@ -246,9 +250,18 @@
 
   <script>
     /* =========================================================
-       👇👇👇 REPLACE THIS WITH YOUR EMAIL ADDRESS! 👇👇👇
+       👇👇👇 PASTE YOUR EMAILJS KEYS HERE 👇👇👇
        ========================================================= */
-    const YOUR_EMAIL = "satyam.priyadarshi@outlook.com"; 
+    const PUBLIC_KEY = "TLjnMSaNQXVdzv53d"; 
+    const SERVICE_ID = "service_4wvxdlk";
+    const TEMPLATE_ID = "template_jcfwf8d";
+
+    /* ========================================================= */
+
+    // Initialize EmailJS
+    (function() {
+      emailjs.init(PUBLIC_KEY);
+    })();
 
     const step1 = document.getElementById("step1");
     const step2 = document.getElementById("step2");
@@ -257,7 +270,6 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
 
-    /* CONFETTI SETUP */
     const confettiCanvas = document.getElementById("confettiCanvas");
     function resizeConfettiCanvas() {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -281,7 +293,6 @@
       }, 300);
     }
 
-    /* BUTTON LOGIC */
     let yesScale = 1;
     function growYes() {
       yesScale = Math.min(2.2, yesScale + 0.1);
@@ -315,38 +326,32 @@
       confettiInstance({ particleCount: 50, spread: 70, origin: { y: 0.7 }});
     });
 
-    /* FORM SUBMISSION */
+    // SUBMIT FORM WITH EMAILJS
     step2.addEventListener("submit", async (e) => {
       e.preventDefault();
       
       const formData = new FormData(step2);
       const data = Object.fromEntries(formData.entries());
 
-      // Show result immediately (optimistic UI)
+      // 1. Show Result Immediately (Optimistic)
       step2.style.display = "none";
       step3.style.display = "block";
       resizeConfettiCanvas();
       fullScreenConfetti();
 
-      // Send email quietly in background
-      if(YOUR_EMAIL !== "PUT_YOUR_EMAIL_HERE") {
-        try {
-          await fetch(`https://formsubmit.co/ajax/${YOUR_EMAIL}`, {
-            method: "POST",
-            headers: { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
-        } catch (err) {
-          console.error("Failed to send email", err);
-        }
-      } else {
-        console.warn("Email not set in code!");
+      // 2. Send Email in Background
+      try {
+        await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+          date_pref: data.date_pref,
+          food: data.food,
+          activity: data.activity,
+          message: data.message
+        });
+        console.log("Email sent successfully!");
+      } catch (err) {
+        console.error("Failed to send email", err);
       }
     });
   </script>
 </body>
 </html>
-
