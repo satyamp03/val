@@ -59,6 +59,15 @@
       font-size: clamp(26px, 4vw, 44px);
       margin: 12px 0 18px;
     }
+    
+    /* NEW: Style for Valentine's face */
+    .val-face {
+      height: 1.5em;   /* Matches text height */
+      vertical-align: middle; /* Aligns nicely with text */
+      border-radius: 6px; /* Slight rounded corners */
+      margin: 0 2px;
+    }
+
     .button-zone {
       position: relative;
       width: min(520px, 92%);
@@ -203,7 +212,9 @@
         <circle cx="220" cy="130" r="8"/>
         <path d="M190 144 C186 144 182 148 182 152 C182 160 190 164 190 170 C190 164 198 160 198 152 C198 148 194 144 190 144Z" fill="#ff7aa2"/>
       </svg>
-      <h1>meghna will you be my valentine?</h1>
+      
+      <h1>meghna will you be my <img src="val.png" alt="Valentine" class="val-face">?</h1>
+
       <section class="button-zone" id="zone">
         <button id="yesBtn">Yes</button>
         <button id="noBtn">No</button>
