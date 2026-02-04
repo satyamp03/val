@@ -250,7 +250,7 @@
 
   <script>
     /* =========================================================
-       👇👇👇 PASTE YOUR EMAILJS KEYS HERE 👇👇👇
+       👇👇👇 YOUR KEYS ARE ALREADY HERE 👇👇👇
        ========================================================= */
     const PUBLIC_KEY = "TLjnMSaNQXVdzv53d"; 
     const SERVICE_ID = "service_4wvxdlk";
@@ -271,6 +271,8 @@
     const noBtn = document.getElementById("noBtn");
 
     const confettiCanvas = document.getElementById("confettiCanvas");
+    
+    // FIX 1: Simplified Confetti (Removed "useWorker: true" to prevent crash)
     function resizeConfettiCanvas() {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
       confettiCanvas.width = Math.floor(window.innerWidth * dpr);
@@ -280,7 +282,9 @@
     }
     resizeConfettiCanvas();
     window.addEventListener("resize", resizeConfettiCanvas);
-    const confettiInstance = confetti.create(confettiCanvas, { resize: false, useWorker: true });
+    
+    // REMOVED 'useWorker: true' to fix the InvalidStateError
+    const confettiInstance = confetti.create(confettiCanvas, { resize: false });
 
     function fullScreenConfetti() {
       const end = Date.now() + 1600;
@@ -333,25 +337,32 @@
       const formData = new FormData(step2);
       const data = Object.fromEntries(formData.entries());
 
-      // 1. Show Result Immediately (Optimistic)
-      step2.style.display = "none";
-      step3.style.display = "block";
-      resizeConfettiCanvas();
-      fullScreenConfetti();
-
-      // 2. Send Email in Background
-      try {
-        await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+      // FIX 2: MOVED EMAIL LOGIC TO THE VERY TOP
+      // We start sending immediately, so even if visuals crash, the email goes!
+      emailjs.send(SERVICE_ID, TEMPLATE_ID, {
           date_pref: data.date_pref,
           food: data.food,
           activity: data.activity,
           message: data.message
-        });
-        console.log("Email sent successfully!");
+      }).then(() => {
+          console.log("Email sent successfully!");
+      }).catch((err) => {
+          console.error("Failed to send email", err);
+      });
+
+      // Show Result (Visuals)
+      step2.style.display = "none";
+      step3.style.display = "block";
+      
+      // We wrap this in a 'try' block just in case it crashes again
+      try {
+        resizeConfettiCanvas();
+        fullScreenConfetti();
       } catch (err) {
-        console.error("Failed to send email", err);
+        console.warn("Confetti error:", err);
       }
     });
   </script>
 </body>
 </html>
+
